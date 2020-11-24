@@ -1877,3 +1877,18 @@ def test_loc_int_in_object_index(frame_or_series, value):
     result = obj.loc[value:"third"]
     expected = frame_or_series(range(4), index=[value, "first", 2, "third"])
     tm.assert_equal(result, expected)
+
+
+def test_loc_correct_upcast():
+    # GH: 37692
+    # Initial DataFrame is int64
+    df = pd.DataFrame(index=['A','B','C'])
+    df['D'] = 0
+    df.at['C', 'D'] = 2
+    assert df['D'].dtypes == np.dtype(np.int64)
+
+    # Test upcasting from int64 to float64
+    df_loc_copy = df
+    df_loc_copy.loc['B', 'D'] = 44.5
+    assert df_loc_copy['D'].dtypes == np.dtype(np.float64)
+

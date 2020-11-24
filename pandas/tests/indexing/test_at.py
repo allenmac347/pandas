@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pytest
 
+import pandas as pd
 from pandas import DataFrame, Series
 import pandas._testing as tm
 
@@ -108,3 +109,17 @@ class TestAtErrors:
             df.at["a", 0]
         with pytest.raises(KeyError, match="^0$"):
             df.loc["a", 0]
+
+
+def test_at_correct_upcast():
+    # GH: 37692
+    # Initial DataFrame is int64
+    df = pd.DataFrame(index=['A','B','C'])
+    df['D'] = 0
+    df.at['C', 'D'] = 2
+    assert df['D'].dtypes == np.dtype(np.int64)
+
+    # Test upcasting from int64 to float64
+    df_at_copy = df
+    df_at_copy.at['B', 'D'] = 44.5
+    assert df_at_copy['D'].dtypes == np.dtype(np.float64)

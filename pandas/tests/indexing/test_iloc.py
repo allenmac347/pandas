@@ -910,3 +910,17 @@ class TestILocSeries:
     def test_iloc_getitem_nonunique(self):
         ser = Series([0, 1, 2], index=[0, 1, 0])
         assert ser.iloc[2] == 2
+
+def test_iloc_correct_upcast():
+    # GH: 37692
+    # Initial DataFrame is int64
+    df = pd.DataFrame(index=['A','B','C'])
+    df['D'] = 0
+    df.at['C', 'D'] = 2
+    assert df['D'].dtypes == np.dtype(np.int64)
+
+    # Test upcasting from int64 to float64
+    df_iloc_copy = df
+    df_iloc_copy.iloc[1, 0] = 44.5
+    assert df_iloc_copy['D'].dtypes == np.dtype(np.float64)
+  
