@@ -38,3 +38,13 @@ def test_iat_correct_upcast():
     df_iat_copy = df.copy()
     df_iat_copy.iat[1, 0] = "hello"
     assert df_iat_copy['D'].dtypes == np.dtype(np.object)
+
+    # Make initial DataFrame a float64
+    df = pd.DataFrame(index=['A','B','C'])
+    df['D'] = 0.0
+    assert df['D'].dtypes == np.dtype(np.float64)
+
+    # Test upcasting from float64 to object
+    df_iat_copy = df.copy()
+    df_iat_copy.iat[1, 0] = "hello"
+    assert df_iat_copy['D'].dtypes == np.dtype(np.object)

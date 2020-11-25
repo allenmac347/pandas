@@ -1901,3 +1901,12 @@ def test_loc_correct_upcast():
     df_loc_copy.loc['B', 'D'] = "hello"
     assert df_loc_copy['D'].dtypes == np.dtype(np.object)
     
+    # Make initial DataFrame a float64
+    df = pd.DataFrame(index=['A','B','C'])
+    df['D'] = 0.0
+    assert df['D'].dtypes == np.dtype(np.float64)
+
+    # Test upcasting from float64 to object
+    df_loc_copy = df.copy()
+    df_loc_copy.loc['B', 'D'] = "hello"
+    assert df_loc_copy['D'].dtypes == np.dtype(np.object)
