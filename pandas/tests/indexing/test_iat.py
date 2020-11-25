@@ -22,10 +22,19 @@ def test_iat_correct_upcast():
     # Initial DataFrame is int64
     df = pd.DataFrame(index=['A','B','C'])
     df['D'] = 0
-    df.at['C', 'D'] = 2
     assert df['D'].dtypes == np.dtype(np.int64)
 
     # Test upcasting from int64 to float64
-    df_iat_copy = df
+    df_iat_copy = df.copy()
     df_iat_copy.iat[1, 0] = 44.5
     assert df_iat_copy['D'].dtypes == np.dtype(np.float64)
+
+    # Test upcasting from int32 to float64
+    df_iat_copy = df.astype('int32')
+    df_iat_copy.iat[1, 0] = 44.5
+    assert df_iat_copy['D'].dtypes == np.dtype(np.float64)
+
+    # Test upcasting from int64 to object
+    df_iat_copy = df.copy()
+    df_iat_copy.iat[1, 0] = "hello"
+    assert df_iat_copy['D'].dtypes == np.dtype(np.object)

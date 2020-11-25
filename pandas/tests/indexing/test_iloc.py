@@ -916,11 +916,19 @@ def test_iloc_correct_upcast():
     # Initial DataFrame is int64
     df = pd.DataFrame(index=['A','B','C'])
     df['D'] = 0
-    df.at['C', 'D'] = 2
     assert df['D'].dtypes == np.dtype(np.int64)
 
     # Test upcasting from int64 to float64
-    df_iloc_copy = df
+    df_iloc_copy = df.copy()
     df_iloc_copy.iloc[1, 0] = 44.5
     assert df_iloc_copy['D'].dtypes == np.dtype(np.float64)
   
+    # Test upcasting from int32 to float64
+    df_iloc_copy = df.astype('int32')
+    df_iloc_copy.iloc[1, 0] = 44.5
+    assert df_iloc_copy['D'].dtypes == np.dtype(np.float64)
+
+    # Tests if upcasting from int64 to object
+    df_iloc_copy = df.copy()
+    df_iloc_copy.iloc[1, 0] = "hello"
+    assert df_iloc_copy['D'].dtypes == np.dtype(np.object)
