@@ -3198,17 +3198,26 @@ class DataFrame(NDFrame, OpsMixin):
         try:
             if takeable is True:
                 series = self._ixs(col, axis=1)
-                series._set_value(index, value, takeable=True)
+                if find_common_type([np.array([value]).dtype, series.dtype]) == series.dtype:
+                    series._set_value(index, value, takeable=True)
+                else:
+                    raise TypeError
                 return
 
             series = self._get_item_cache(col)
             engine = self.index._engine
             loc = engine.get_loc(index)
+            # TODO:
+            # This is an insufficent check 
+            # Need to upcast if necessary 
             validate_numeric_casting(series.dtype, value)
-
-            series._values[loc] = value
+            if find_common_type([np.array([value]).dtype, series.dtype]) == series.dtype:
+                series._values[loc] = value
+            else:
+                raise TypeError
             # Note: trying to use series._set_value breaks tests in
             #  tests.frame.indexing.test_indexing and tests.indexing.test_partial
+
         except (KeyError, TypeError):
             # set using a non-recursive method & reset the cache
             if takeable:
